@@ -19,23 +19,24 @@ fun main(args: Array<String>) {
         val (from, to) = input.split(SEPERATOR).let {
             Coordinate.parse(it.first().trim()) to Coordinate.parse(it.last().trim())
         }
-        /* try {
-            val (from, to) = input.split(SEPERATOR).let {
-                Coordinate.parse(it.first().trim()) to Coordinate.parse(it.last().trim())
+
+
+
+
+        try {
+//            val (from, to) = input.split(SEPERATOR).let {
+//                Coordinate.parse(it.first().trim()) to Coordinate.parse(it.last().trim())
+//            }
+
+            val chosenPiece = board[from]
+            if (chosenPiece == null) {
+            } else {
+                if (chosenPiece.validMoves.contains(to)) {
+                    board[to] = board.remove(from)!!
+                }
             }
-        } catch (e: IllegalStateException) {
+        } catch (e: NotImplementedError) {
             println("You're dumb!")
-        }
-
-        Need to redo this code since only valid moves are allowed now
-
-        */
-        val chosenPiece = board[from]
-        if (chosenPiece == null) {
-        } else {
-            if (chosenPiece.validMoves.contains(to)) {
-                board[to] = board.remove(from)!!
-            }
         }
 
     }

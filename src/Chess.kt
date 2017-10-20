@@ -37,6 +37,8 @@ fun main(args: Array<String>) {
             }
         } catch (e: NotImplementedError) {
             println("You're dumb!")
+        } catch (e: IllegalStateException) {
+            println("You're dumb!")
         }
 
     }

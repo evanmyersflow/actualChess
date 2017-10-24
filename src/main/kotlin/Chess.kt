@@ -22,15 +22,30 @@ fun main(args: Array<String>) {
                 Coordinate.parse(it.first().trim()) to Coordinate.parse(it.last().trim())
             }
         } catch (e: IllegalStateException) {
+            println("You're dumb!")
             continue
         }
 
+        try {
         val chosenPiece = board[from]
         if (chosenPiece == null) {
         } else {
             if (chosenPiece.validMoves.contains(to)) {
-                board[to] = board.remove(from)!!
+                    val oldPiece = board.remove(from)!!
+                board[to] = when (oldPiece) {
+                    is Rook -> Rook(oldPiece.isWhite, to)
+                    is Queen -> Queen(oldPiece.isWhite, to)
+                    is Bishop -> Bishop(oldPiece.isWhite, to)
+                    is Knight -> Knight(oldPiece.isWhite, to)
+                    is King -> King(oldPiece.isWhite, to)
+                    is Pawn -> Pawn(oldPiece.isWhite, to)
+                    else -> TODO()
+                }
+                }
             }
+        } catch (e: IllegalStateException) {
+        } catch (e: NotImplementedError) {
+            continue
         }
     }
 }

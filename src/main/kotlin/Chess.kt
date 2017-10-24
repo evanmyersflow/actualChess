@@ -16,34 +16,24 @@ fun main(args: Array<String>) {
         printBoard()
         val scanner = Scanner(System.`in`)
         val input = scanner.nextLine().toUpperCase()
-        val (from, to) = input.split(SEPERATOR).let {
-            Coordinate.parse(it.first().trim()) to Coordinate.parse(it.last().trim())
-        }
 
-
-
-
-        try {
-//            val (from, to) = input.split(SEPERATOR).let {
-//                Coordinate.parse(it.first().trim()) to Coordinate.parse(it.last().trim())
-//            }
-
-            val chosenPiece = board[from]
-            if (chosenPiece == null) {
-            } else {
-                if (chosenPiece.validMoves.contains(to)) {
-                    board[to] = board.remove(from)!!
-                }
+        val (from, to) = try {
+            input.split(SEPERATOR).let {
+                Coordinate.parse(it.first().trim()) to Coordinate.parse(it.last().trim())
             }
-        } catch (e: NotImplementedError) {
-            println("You're dumb!")
         } catch (e: IllegalStateException) {
-            println("You're dumb!")
+            continue
         }
 
+        val chosenPiece = board[from]
+        if (chosenPiece == null) {
+        } else {
+            if (chosenPiece.validMoves.contains(to)) {
+                board[to] = board.remove(from)!!
+            }
+        }
     }
 }
-
 
 private fun printBoard() {
     println()
@@ -106,6 +96,7 @@ data class Coordinate(val x: Int, val y: Int) {
                 throw IllegalStateException()
             }
             val x = notation.indexOf(input.first().toString())
+
             if (x < 0) {
                 throw  IllegalStateException()
             }
@@ -122,19 +113,17 @@ data class Rook(override val isWhite: Boolean, override val coordinate: Coordina
         get() {
             val validMoves = ArrayList<Coordinate>()
 
-            for (i in BOARD_RANGE) {
-                val validMove = Coordinate(coordinate.x, i)
-                if (coordinate != validMove) {
-                    validMoves += validMove
-                }
-            }
+            BOARD_RANGE
+                    .asSequence()
+                    .map { Coordinate(coordinate.x, it) }
+                    .filter { coordinate != it }
+                    .forEach { validMoves += it }
 
-            for (i in BOARD_RANGE) {
-                val validMove = Coordinate(i, coordinate.y)
-                if (coordinate != validMove) {
-                    validMoves += validMove
-                }
-            }
+            BOARD_RANGE
+                    .asSequence()
+                    .map { Coordinate(it, coordinate.y) }
+                    .filter { coordinate != it }
+                    .forEach { validMoves += it }
 
             return validMoves
         }
@@ -179,21 +168,19 @@ data class Queen(override val isWhite: Boolean, override val coordinate: Coordin
         get() {
             val validMoves = ArrayList<Coordinate>()
 
-            for (i in BOARD_RANGE) {
-                val validMove = Coordinate(coordinate.x, i)
-                if (coordinate != validMove) {
-                    validMoves += validMove
-                }
-            }
+            BOARD_RANGE
+                    .asSequence()
+                    .map { Coordinate(coordinate.x, it) }
+                    .filter { coordinate != it }
+                    .forEach { validMoves += it }
 
-            for (i in BOARD_RANGE) {
-                val validMove = Coordinate(i, coordinate.y)
-                if (coordinate != validMove) {
-                    validMoves += validMove
-                }
-            }
+            BOARD_RANGE
+                    .asSequence()
+                    .map { Coordinate(it, coordinate.y) }
+                    .filter { coordinate != it }
+                    .forEach { validMoves += it }
 
-            for (i in coordinate.x..BOARD_SIZE) {
+            (coordinate.x..BOARD_SIZE).forEach { i ->
                 val up = Coordinate(i, coordinate.y + i)
                 val down = Coordinate(i, coordinate.y - i)
 

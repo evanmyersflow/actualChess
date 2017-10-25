@@ -43,7 +43,6 @@ fun main(args: Array<String>) {
                 }
                 }
             }
-        } catch (e: IllegalStateException) {
         } catch (e: NotImplementedError) {
             continue
         }
@@ -172,6 +171,17 @@ data class Bishop(override val isWhite: Boolean, override val coordinate: Coordi
                 }
             }
 
+            for (j in coordinate.y..BOARD_SIZE) {
+                val upJ = Coordinate(coordinate.x + j, j)
+                val downJ = Coordinate(coordinate.x - j, j)
+
+                if (upJ.x in BOARD_RANGE) {
+                    validMoves += upJ
+                }
+                if (downJ.x in BOARD_RANGE) {
+                    validMoves += downJ
+                }
+            }
             return validMoves
         }
 

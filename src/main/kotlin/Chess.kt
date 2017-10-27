@@ -164,10 +164,10 @@ data class King(override val isWhite: Boolean, override val coordinate: Coordina
         get() {
             val validMoves = ArrayList<Coordinate>()
 
-            validMoves.addAll(getKingMoves(coordinate, 1))
+            validMoves.addAll(getUpDownMoves(coordinate, 1))
+            validMoves.addAll(getDiagonAlleyMoves(coordinate, 1))
 
             return validMoves.distinct()
-
         }
 
     override fun toString(): String = if (isWhite) "Kw" else "Kb"
@@ -182,6 +182,7 @@ data class Pawn(override val isWhite: Boolean, override val coordinate: Coordina
     override fun toString(): String = if (isWhite) "Pw" else "Pb"
 }
 
+//Squares
 
 data class NullPiece(override val isWhite: Boolean, override val coordinate: Coordinate) : Piece {
     override val validMoves: List<Coordinate>
@@ -190,7 +191,7 @@ data class NullPiece(override val isWhite: Boolean, override val coordinate: Coo
     override fun toString(): String = if (isWhite) "~ " else "- "
 }
 
-private fun getUpDownMoves(coordinate: Coordinate, size: Int = BOARD_SIZE): List<Coordinate> {
+private fun getUpDownMoves(coordinate: Coordinate): List<Coordinate> {
     val validMoves = ArrayList<Coordinate>()
 
     BOARD_RANGE
@@ -238,59 +239,18 @@ private fun getDiagonAlleyMoves(coordinate: Coordinate, size: Int = BOARD_SIZE):
     return validMoves.distinct()
 }
 
-private fun getKingMoves(coordinate: Coordinate, size: Int = BOARD_SIZE): List<Coordinate> {
-    val validMoves = ArrayList<Coordinate>()
-
-    for ((i, j) in (coordinate.x..size).withIndex()) {
-        val up = Coordinate(j, coordinate.y + i)
-        val down = Coordinate(j, coordinate.y - i)
-
-        if (up.y in BOARD_RANGE) {
-            validMoves += up
-        }
-        if (down.y in BOARD_RANGE) {
-            validMoves += down
-        }
-    }
-
-    for ((i, j) in (coordinate.x downTo coordinate.x - size).withIndex()) {
-        val up = Coordinate(j, coordinate.y + i)
-        val down = Coordinate(j, coordinate.y - i)
-
-        if (up.y in BOARD_RANGE) {
-            validMoves += up
-        }
-        if (down.y in BOARD_RANGE) {
-            validMoves += down
-        }
-    }
-
-    for ((i, j) in (coordinate.x downTo size).withIndex()) {
-        val up = Coordinate(j, coordinate.y + i)
-        val down = Coordinate(j, coordinate.y - i)
-
-        if (size == 1) {
-            validMoves += up
-            validMoves += down
-        }
-
-    }
-                return validMoves.distinct()
-}
-
-    fun <T> letOnSquare(coordinate: Coordinate, block: (Boolean) -> T): T {
-        return if (coordinate.y % 2 == 0) {
-            if (coordinate.x % 2 == 0) {
-                block(true)
-            } else {
-                block(false)
-            }
+fun <T> letOnSquare(coordinate: Coordinate, block: (Boolean) -> T): T {
+    return if (coordinate.y % 2 == 0) {
+        if (coordinate.x % 2 == 0) {
+            block(true)
         } else {
-            if (coordinate.x % 2 == 0) {
-                block(false)
-            } else {
-                block(true)
-            }
+            block(false)
+        }
+    } else {
+        if (coordinate.x % 2 == 0) {
+            block(false)
+        } else {
+            block(true)
         }
     }
-
+}

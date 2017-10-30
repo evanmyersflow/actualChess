@@ -78,7 +78,7 @@ private fun setupSide(white: Boolean) {
     addPiece(Bishop(white, Coordinate(2, row1Y)))
     addPiece(Bishop(white, Coordinate(5, row1Y)))
     addPiece(Queen(white, Coordinate(3, row1Y)))
-    addPiece(King(white, Coordinate(4, row1Y)))
+    addPiece(King(white, Coordinate(4, 3)))
 
     val row2Y = if (white) 1 else 6
     addPiece(Pawn(white, Coordinate(0, row2Y)))
@@ -191,22 +191,28 @@ data class NullPiece(override val isWhite: Boolean, override val coordinate: Coo
     override fun toString(): String = if (isWhite) "~ " else "- "
 }
 
-private fun getUpDownMoves(coordinate: Coordinate): List<Coordinate> {
+private fun getUpDownMoves(coordinate: Coordinate, size: Int = BOARD_SIZE): List<Coordinate> {
     val validMoves = ArrayList<Coordinate>()
 
-    BOARD_RANGE
-            .asSequence()
+    (coordinate.y..Math.min(coordinate.y + size, BOARD_SIZE))
+            .map { Coordinate(coordinate.x, it) }
+            .filter { coordinate != it }
+            .forEach { validMoves += it }
+    (coordinate.y downTo Math.max(coordinate.y - size, 0))
             .map { Coordinate(coordinate.x, it) }
             .filter { coordinate != it }
             .forEach { validMoves += it }
 
-    BOARD_RANGE
-            .asSequence()
+    (coordinate.x..Math.min(size + coordinate.x, BOARD_SIZE))
+            .map { Coordinate(it, coordinate.y) }
+            .filter { coordinate != it }
+            .forEach { validMoves += it }
+    (coordinate.x downTo Math.max(coordinate.x - size, 0))
             .map { Coordinate(it, coordinate.y) }
             .filter { coordinate != it }
             .forEach { validMoves += it }
 
-    return validMoves
+    return validMoves.distinct()
 }
 
 private fun getDiagonAlleyMoves(coordinate: Coordinate, size: Int = BOARD_SIZE): List<Coordinate> {
@@ -222,7 +228,21 @@ private fun getDiagonAlleyMoves(coordinate: Coordinate, size: Int = BOARD_SIZE):
         if (down.y in BOARD_RANGE) {
             validMoves += down
         }
+
     }
+    for ((i, j) in (coordinate.y..size).withIndex()) {
+        val up = Coordinate(coordinate.x + i, j)
+        val down = Coordinate(coordinate.x - i, j)
+
+        if (up.x in BOARD_RANGE) {
+            validMoves += up
+        }
+        if (down.x in BOARD_RANGE) {
+            validMoves += down
+        }
+
+    }
+
 
     for ((i, j) in (coordinate.x downTo coordinate.x - size).withIndex()) {
         val up = Coordinate(j, coordinate.y + i)
@@ -234,6 +254,19 @@ private fun getDiagonAlleyMoves(coordinate: Coordinate, size: Int = BOARD_SIZE):
         if (down.y in BOARD_RANGE) {
             validMoves += down
         }
+
+    }
+    for ((i, j) in (coordinate.y downTo coordinate.y - size).withIndex()) {
+        val up = Coordinate(coordinate.x + i, j)
+        val down = Coordinate(coordinate.x - i, j)
+
+        if (up.x in BOARD_RANGE) {
+            validMoves += up
+        }
+        if (down.x in BOARD_RANGE) {
+            validMoves += down
+        }
+
     }
 
     return validMoves.distinct()

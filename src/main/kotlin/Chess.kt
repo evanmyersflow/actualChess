@@ -83,7 +83,7 @@ private fun setupSide(white: Boolean) {
     addPiece(Bishop(white, Coordinate(2, row1Y)))
     addPiece(Bishop(white, Coordinate(5, row1Y)))
     addPiece(Queen(white, Coordinate(3, row1Y)))
-    addPiece(King(white, Coordinate(4, 3)))
+    addPiece(King(white, Coordinate(4, 4)))
 
     val row2Y = if (white) 1 else 6
     addPiece(Pawn(white, Coordinate(0, row2Y)))
@@ -170,8 +170,8 @@ data class King(override val isWhite: Boolean, override val coordinate: Coordina
             val validMoves = ArrayList<Coordinate>()
 
             validMoves.addAll(getUpDownMoves(coordinate, 1))
-            validMoves.addAll(getDiagonAlleyMoves(coordinate, 1))
-
+            // validMoves.addAll(getDiagonAlleyMoves(coordinate, 1))
+            validMoves.addAll(getDiagonAlleyMoves(coordinate))
             return validMoves.distinct()
         }
 
@@ -200,7 +200,7 @@ data class PlaceholderPiece(override val coordinate: Coordinate) : Piece {
     override val isWhite = false
     override val validMoves: List<Coordinate> = emptyList()
 
-    override fun toString(): String = "+ "
+    override fun toString(): String = "X "
 }
 
 private fun getUpDownMoves(coordinate: Coordinate, size: Int = BOARD_SIZE): List<Coordinate> {

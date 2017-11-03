@@ -134,9 +134,7 @@ data class Rook(override val isWhite: Boolean, override val coordinate: Coordina
 
 data class Knight(override val isWhite: Boolean, override val coordinate: Coordinate) : Piece {
     override val validMoves: List<Coordinate>
-        get() {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
+        get() = getKnightMoves(coordinate)
 
     override fun toString(): String = if (isWhite) "Nw" else "Nb"
 }
@@ -270,9 +268,15 @@ private  fun getBlackPawnMoves(coordinate: Coordinate, size: Int = BOARD_SIZE): 
 private fun getKnightMoves(coordinate: Coordinate, size: Int = BOARD_SIZE): List<Coordinate> {
     val validMoves = ArrayList<Coordinate>()
 
-    for () {
+    validMoves += Coordinate(coordinate.x + 1, coordinate.y + 2)
+    validMoves += Coordinate(coordinate.x - 1, coordinate.y + 2)
+    validMoves += Coordinate(coordinate.x + 1, coordinate.y - 2)
+    validMoves += Coordinate(coordinate.x - 1, coordinate.y - 2)
+    validMoves += Coordinate(coordinate.x + 2, coordinate.y + 1)
+    validMoves += Coordinate(coordinate.x - 2, coordinate.y + 1)
+    validMoves += Coordinate(coordinate.x + 2, coordinate.y - 1)
+    validMoves += Coordinate(coordinate.x - 2, coordinate.y - 1)
 
-    }
     return validMoves
 
 }

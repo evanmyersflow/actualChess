@@ -9,7 +9,7 @@ const val BOARD_SIZE = 7
 val BOARD_RANGE = 0..BOARD_SIZE
 
 fun main(args: Array<String>) {
-    setupBoard()
+    setUpBoard()
 
     println("Let the game begin!")
 
@@ -60,7 +60,7 @@ private fun printBoard(board: Map<Coordinate, Piece>) {
         for (j in BOARD_RANGE) {
             val coordinate = Coordinate(j, i)
             val piece: Piece = board[coordinate] ?:
-            letOnSquare(coordinate) { NullPiece(it, coordinate) }
+                    letOnSquare(coordinate) { NullPiece(it, coordinate) }
 
             print(if (j in 0..6) "$piece " else piece)
         }
@@ -69,12 +69,12 @@ private fun printBoard(board: Map<Coordinate, Piece>) {
     println()
 }
 
-private fun setupBoard() {
-    setupSide(true)
-    setupSide(false)
+private fun setUpBoard() {
+    setUpSide(true)
+    setUpSide(false)
 }
 
-private fun setupSide(white: Boolean) {
+private fun setUpSide(white: Boolean) {
     val row1Y = if (white) 0 else BOARD_SIZE
     addPiece(Rook(white, Coordinate(0, row1Y)))
     addPiece(Rook(white, Coordinate(7, row1Y)))
@@ -83,7 +83,7 @@ private fun setupSide(white: Boolean) {
     addPiece(Bishop(white, Coordinate(2, row1Y)))
     addPiece(Bishop(white, Coordinate(5, row1Y)))
     addPiece(Queen(white, Coordinate(3, row1Y)))
-    addPiece(King(white, Coordinate(4, 4)))
+    addPiece(King(white, Coordinate(4, row1Y)))
 
     val row2Y = if (white) 1 else 6
     addPiece(Pawn(white, Coordinate(0, row2Y)))
@@ -125,8 +125,6 @@ data class Coordinate(val x: Int, val y: Int) {
     }
 }
 
-//Pieces
-
 data class Rook(override val isWhite: Boolean, override val coordinate: Coordinate) : Piece {
     override val validMoves: List<Coordinate>
         get() = getUpDownMoves(coordinate)
@@ -154,10 +152,8 @@ data class Queen(override val isWhite: Boolean, override val coordinate: Coordin
     override val validMoves: List<Coordinate>
         get() {
             val validMoves = ArrayList<Coordinate>()
-
             validMoves.addAll(getUpDownMoves(coordinate))
             validMoves.addAll(getDiagonAlleyMoves(coordinate))
-
             return validMoves.distinct()
         }
 
@@ -168,10 +164,8 @@ data class King(override val isWhite: Boolean, override val coordinate: Coordina
     override val validMoves: List<Coordinate>
         get() {
             val validMoves = ArrayList<Coordinate>()
-
             validMoves.addAll(getUpDownMoves(coordinate, 1))
-            // validMoves.addAll(getDiagonAlleyMoves(coordinate, 1))
-            validMoves.addAll(getDiagonAlleyMoves(coordinate))
+            validMoves.addAll(getDiagonAlleyMoves(coordinate, 1))
             return validMoves.distinct()
         }
 
@@ -181,13 +175,24 @@ data class King(override val isWhite: Boolean, override val coordinate: Coordina
 data class Pawn(override val isWhite: Boolean, override val coordinate: Coordinate) : Piece {
     override val validMoves: List<Coordinate>
         get() {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            val validMoves = ArrayList<Coordinate>()
+            if (isWhite) {
+                validMoves += getWhitePawnMoves(coordinate)
+            } else {
+                validMoves += getBlackPawnMoves(coordinate)
+            }
+            if (coordinate.y == 1 && isWhite) {
+                validMoves += Coordinate(coordinate.x, coordinate.y + 2)
+            }
+            if (coordinate.y == 6 && isWhite == false) {
+                validMoves += Coordinate(coordinate.x, coordinate.y - 2)
+            }
+
+            return validMoves
         }
 
     override fun toString(): String = if (isWhite) "Pw" else "Pb"
 }
-
-//Squares
 
 data class NullPiece(override val isWhite: Boolean, override val coordinate: Coordinate) : Piece {
     override val validMoves: List<Coordinate>
@@ -230,57 +235,46 @@ private fun getUpDownMoves(coordinate: Coordinate, size: Int = BOARD_SIZE): List
 private fun getDiagonAlleyMoves(coordinate: Coordinate, size: Int = BOARD_SIZE): List<Coordinate> {
     val validMoves = ArrayList<Coordinate>()
 
-    for ((i, j) in (coordinate.x..size).withIndex()) {
-        val up = Coordinate(j, coordinate.y + i)
-        val down = Coordinate(j, coordinate.y - i)
-
-        if (up.y in BOARD_RANGE) {
-            validMoves += up
-        }
-        if (down.y in BOARD_RANGE) {
-            validMoves += down
-        }
+    for ((index, position) in (coordinate.y..Math.min(coordinate.y + size, BOARD_SIZE)).withIndex()) {
+        validMoves += Coordinate(coordinate.x + index, position)
+        validMoves += Coordinate(coordinate.x - index, position)
     }
-
-    for ((i, j) in (coordinate.x downTo coordinate.x - size).withIndex()) {
-        val up = Coordinate(j, coordinate.y + i)
-        val down = Coordinate(j, coordinate.y - i)
-
-        if (up.y in BOARD_RANGE) {
-            validMoves += up
-        }
-        if (down.y in BOARD_RANGE) {
-            validMoves += down
-        }
-
-    }
-
-    for ((j, i) in (coordinate.y..size).withIndex()) {
-        val up = Coordinate(coordinate.x + i, j)
-        val down = Coordinate(coordinate.x - i, j)
-
-        if (up.x in BOARD_RANGE) {
-            validMoves += up
-        }
-        if (down.x in BOARD_RANGE) {
-            validMoves += down
-        }
-
-    }
-    for ((j, i) in (coordinate.y downTo coordinate.y - size).withIndex()) {
-        val up = Coordinate(coordinate.x + i, j)
-        val down = Coordinate(coordinate.x - i, j)
-
-        if (up.x in BOARD_RANGE) {
-            validMoves += up
-        }
-        if (down.x in BOARD_RANGE) {
-            validMoves += down
-        }
-
+    for ((index, position) in (coordinate.y downTo Math.max(coordinate.y - size, 0)).withIndex()) {
+        validMoves += Coordinate(coordinate.x + index, position)
+        validMoves += Coordinate(coordinate.x - index, position)
     }
 
     return validMoves.distinct()
+}
+
+private  fun getWhitePawnMoves(coordinate: Coordinate, size: Int = BOARD_SIZE): List<Coordinate> {
+    val validMoves = ArrayList<Coordinate>()
+
+        validMoves += Coordinate(coordinate.x, coordinate.y + 1)
+        validMoves += Coordinate(coordinate.x - 1, coordinate.y + 1)
+        validMoves += Coordinate(coordinate.x + 1, coordinate.y + 1)
+
+    return  validMoves
+}
+
+private  fun getBlackPawnMoves(coordinate: Coordinate, size: Int = BOARD_SIZE): List<Coordinate> {
+    val validMoves = ArrayList<Coordinate>()
+
+    validMoves += Coordinate(coordinate.x, coordinate.y - 1)
+    validMoves += Coordinate(coordinate.x - 1, coordinate.y - 1)
+    validMoves += Coordinate(coordinate.x + 1, coordinate.y - 1)
+
+    return  validMoves
+}
+
+private fun getKnightMoves(coordinate: Coordinate, size: Int = BOARD_SIZE): List<Coordinate> {
+    val validMoves = ArrayList<Coordinate>()
+
+    for () {
+
+    }
+    return validMoves
+
 }
 
 fun <T> letOnSquare(coordinate: Coordinate, block: (Boolean) -> T): T {
